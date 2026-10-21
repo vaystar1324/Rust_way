@@ -1,0 +1,6 @@
+[gd_resource type="VoxelGeneratorScript" format=3 uid="uid://vl1go0rgr14y"]
+
+[ext_resource type="Script" uid="uid://dwpsrkpygb7di" path="res://скрипты/генератор_мира.gd" id="1_dmmpb"]
+
+[resource]
+script = ExtResource("1_dmmpb")

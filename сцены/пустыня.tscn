@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://yv2ptbuxtwkx"]
+
+[ext_resource type="Texture2D" uid="uid://d2d15ijq0jqfy" path="res://текстуры/песок.jpg" id="1_33hfs"]
+[ext_resource type="PackedScene" uid="uid://dasabj0i5wtrx" path="res://addons/real-controller/character.tscn" id="1_f7nrm"]
+[ext_resource type="Texture2D" uid="uid://20kcvnuw5pxc" path="res://текстуры/дорога.jpg" id="1_kekpu"]
+[ext_resource type="Texture2D" uid="uid://fn10s466ig7y" path="res://текстуры/терракота.jpg" id="1_tehjk"]
+[ext_resource type="Script" uid="uid://bd3p3a1twepy6" path="res://скрипты/пустыня.gd" id="1_vw16r"]
+[ext_resource type="VoxelGeneratorScript" uid="uid://vl1go0rgr14y" path="res://скрипты/воксельный мир генерация.tres" id="2_vw16r"]
+[ext_resource type="PackedScene" uid="uid://bt6pahc6ow0x2" path="res://сцены/доска.tscn" id="5_s1mi3"]
+
+[sub_resource type="VoxelMesherTransvoxel" id="VoxelMesherTransvoxel_33hfs"]
+
+[sub_resource type="Shader" id="Shader_s1mi3"]
+code = "shader_type spatial;
+
+// === Текстуры ===
+group_uniforms Textures;
+uniform sampler2D sand_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D sand_normal : hint_normal, filter_linear_mipmap, repeat_enable;
+uniform sampler2D sand_roughness : hint_roughness_r, filter_linear_mipmap, repeat_enable;
+
+uniform sampler2D rock_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D rock_normal : hint_normal, filter_linear_mipmap, repeat_enable;
+uniform sampler2D rock_roughness : hint_roughness_r, filter_linear_mipmap, repeat_enable;
+
+uniform sampler2D road : source_color, filter_linear_mipmap, repeat_enable;
+
+// === Настройки triplanar ===
+group_uniforms Triplanar;
+uniform float texture_scale : hint_range(0.01, 2.0) = 0.08;
+uniform float blend_sharpness : hint_range(1.0, 16.0) = 6.0;
+
+// === Смешивание по наклону ===
+group_uniforms Slope_Blend;
+uniform float sand_threshold : hint_range(0.0, 1.0) = 0.55;
+uniform float blend_softness : hint_range(0.01, 0.5) = 0.18;
+
+// === Цвета и материалы ===
+group_uniforms Material;
+uniform vec3 sand_tint : source_color = vec3(1.0, 0.92, 0.75);
+uniform vec3 rock_tint : source_color = vec3(0.85, 0.78, 0.65);
+uniform float sand_roughness_mul : hint_range(0.0, 2.0) = 1.1;
+uniform float rock_roughness_mul : hint_range(0.0, 2.0) = 0.95;
+uniform float normal_strength : hint_range(0.0, 2.0) = 1.0;
+
+varying vec3 v_world_pos;
+varying vec3 v_world_normal;
+
+void vertex() {
+	v_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	v_world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
+}
+
+vec4 triplanar_texture(sampler2D tex, vec3 world_pos, vec3 blend) {
+	vec4 x = texture(tex, world_pos.yz);
+	vec4 y = texture(tex, world_pos.xz);
+	vec4 z = texture(tex, world_pos.xy);
+	return x * blend.x + y * blend.y + z * blend.z;
+}
+
+void fragment() {
+	vec3 normal = normalize(v_world_normal);
+	
+	// Вместо обычного blend сделай так:
+	vec3 blend = abs(normal);
+	blend = pow(blend, vec3(12.0)); // было 6.0 — сильно увеличиваем резкость
+	blend /= (blend.x + blend.y + blend.z);
+
+	// Дополнительно усиливаем боковые проекции на крутых стенах
+	float steepness = 1.0 - abs(normal.y);
+	blend.x = max(blend.x, steepness * 0.65);
+	blend.z = max(blend.z, steepness * 0.65);
+	blend.y *= (1.0 - steepness * 0.7);
+	blend /= (blend.x + blend.y + blend.z);
+
+	vec3 uv_pos = v_world_pos * texture_scale;
+	
+	// Сэмплируем основные текстуры
+	vec3 sand_col = triplanar_texture(sand_albedo, uv_pos, blend).rgb * sand_tint;
+	vec3 rock_col = triplanar_texture(rock_albedo, uv_pos, blend).rgb * rock_tint;
+	
+	vec3 sand_nrm = triplanar_texture(sand_normal, uv_pos, blend).rgb;
+	vec3 rock_nrm = triplanar_texture(rock_normal, uv_pos, blend).rgb;
+	
+	float sand_rough = triplanar_texture(sand_roughness, uv_pos, blend).r * sand_roughness_mul;
+	float rock_rough = triplanar_texture(rock_roughness, uv_pos, blend).r * rock_roughness_mul;
+	
+	// Смешивание по наклону (песок / камень)
+	float slope = normal.y;
+	float sand_factor = smoothstep(sand_threshold - blend_softness, sand_threshold + blend_softness, slope);
+	
+	vec3 base_albedo = mix(rock_col, sand_col, sand_factor);
+	vec3 base_normal = mix(rock_nrm, sand_nrm, sand_factor);
+	float base_rough = mix(rock_rough, sand_rough, sand_factor);
+	
+	// === ДОРОГА ===
+	float road_half_width = 8.0;
+	float road_dist = abs(v_world_pos.x);
+	float road_factor = 1.0 - smoothstep(road_half_width * 0.5, road_half_width * 1.05, road_dist);
+	road_factor = pow(road_factor, 1.4);
+	
+	// Текстура дороги
+	vec3 road_color = triplanar_texture(rock_albedo, uv_pos, blend).rgb;
+	road_color *= 0.4; // чуть затемняем
+	
+	// Финальный цвет
+	ALBEDO = mix(base_albedo, road_color, road_factor);
+	
+	// Normal
+	NORMAL_MAP = mix(vec3(0.5, 0.5, 1.0), base_normal, normal_strength);
+	NORMAL_MAP = mix(NORMAL_MAP, vec3(0.5, 0.5, 1.0), road_factor * 0.7);
+	
+	// Roughness
+	ROUGHNESS = mix(base_rough, 0.55, road_factor);
+	
+	METALLIC = 0.0;
+	SPECULAR = 0.35;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_s1mi3"]
+render_priority = 0
+shader = SubResource("Shader_s1mi3")
+shader_parameter/sand_albedo = ExtResource("1_33hfs")
+shader_parameter/rock_albedo = ExtResource("1_tehjk")
+shader_parameter/road = ExtResource("1_kekpu")
+shader_parameter/texture_scale = 0.02500000048898
+shader_parameter/blend_sharpness = 7.7850003222875
+shader_parameter/sand_threshold = 1.0
+shader_parameter/blend_softness = 0.5
+shader_parameter/sand_tint = Color(1, 0.92, 0.75, 1)
+shader_parameter/rock_tint = Color(0.85, 0.78, 0.65, 1)
+shader_parameter/sand_roughness_mul = 1.1
+shader_parameter/rock_roughness_mul = 0.95
+shader_parameter/normal_strength = 1.0
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_f7nrm"]
+sky_top_color = Color(0.25869322, 0.45447284, 0.70332646, 1)
+sky_horizon_color = Color(0.4332099, 0.70108795, 0.7795401, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_33hfs"]
+sky_material = SubResource("ProceduralSkyMaterial_f7nrm")
+
+[sub_resource type="Environment" id="Environment_tehjk"]
+background_mode = 2
+sky = SubResource("Sky_33hfs")
+glow_enabled = true
+fog_enabled = true
+fog_light_color = Color(0.9098039, 0.7882353, 0.6039216, 1)
+fog_sun_scatter = 0.18
+fog_density = 0.0025
+fog_aerial_perspective = 0.5
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.0003
+volumetric_fog_albedo = Color(0.8901961, 0.7058824, 0.54901963, 1)
+volumetric_fog_emission = Color(0.938403, 0.8471245, 0.71044254, 1)
+volumetric_fog_anisotropy = 0.5
+
+[node name="пустыня" type="Node3D" unique_id=311289400]
+script = ExtResource("1_vw16r")
+
+[node name="VoxelLodTerrain" type="VoxelLodTerrain" parent="." unique_id=1937268649]
+generator = ExtResource("2_vw16r")
+mesher = SubResource("VoxelMesherTransvoxel_33hfs")
+view_distance = 1024
+material = SubResource("ShaderMaterial_s1mi3")
+normalmap_use_gpu = true
+collision_margin = 0.1
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=853240355]
+environment = SubResource("Environment_tehjk")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=476485290]
+transform = Transform3D(-0.8660254, -0.4330127, 0.25, 0, 0.5, 0.8660254, -0.5, 0.75, -0.4330127, 0, 234.44391, -121.24131)
+light_color = Color(1, 1, 0.72156864, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Character" parent="." unique_id=1913778194 instance=ExtResource("1_f7nrm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
+
+[node name="доска" parent="." unique_id=984523267 instance=ExtResource("5_s1mi3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 40, 0)
+
+[node name="доска2" parent="." unique_id=1534040515 instance=ExtResource("5_s1mi3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74114513, 40, 0)
