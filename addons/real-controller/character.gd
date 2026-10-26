@@ -196,7 +196,7 @@ func _handle_controller_camera(delta: float) -> void:
 ## Handles smooth camera transition between modes.
 func _handle_camera_transition(delta: float) -> void:
 	spring_arm.spring_length = lerp(spring_arm.spring_length, target_camera_distance, camera_transition_speed * delta)
-	
+
 	if character and camera_distance > 0.0:
 		var transition_progress = spring_arm.spring_length / camera_distance
 		var visibility_threshold = 0.3
