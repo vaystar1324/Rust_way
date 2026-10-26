@@ -22,6 +22,7 @@ enum CameraMode {
 @onready var collision: CollisionShape3D = $CollisionShape3D
 @onready var hand: Marker3D = $RayCast3D/Marker3D
 @onready var voxel_terrain: VoxelLodTerrain = $"../VoxelLodTerrain"
+@onready var aim: Label = $aim
 
 ## Movement Settings
 ## -----------------------------------------------------------------------------
@@ -108,6 +109,9 @@ var rotate_obj: bool = false
 
 var is_moving
 
+var first_connect_obj
+var second_connect_obj
+
 func _ready() -> void:
 	## Captures the mouse cursor for first-person camera control.
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -143,6 +147,11 @@ func _physics_process(delta: float) -> void:
 	if is_holding and is_instance_valid(held_object):
 		_hold_object(delta)
 		_handle_rotation(delta)
+	
+	if raycast.is_colliding():
+		aim.add_theme_color_override("font_color", Color.RED)
+	else:
+		aim.add_theme_color_override("font_color", Color.WHITE)
 
 func handle_frozen_movement() -> void:
 	velocity.x = 0.0
@@ -239,13 +248,38 @@ func _unhandled_input(event: InputEvent) -> void:
 	if frozen:
 		return
 
-	if event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	if event.is_action_pressed("esc"):
+		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 	if event.is_action_pressed("shift"):
 		shift = not shift
 		set_crouch_height(shift)
+	
+	if event.is_action_pressed("select_obj"):
+		var obj
+		if first_connect_obj == null:
+			if raycast.is_colliding():
+				first_connect_obj = raycast.get_collider()
+				obj = first_connect_obj
+		else:
+			if second_connect_obj == null:
+				if raycast.is_colliding():
+					if raycast.get_collider() != first_connect_obj:
+						second_connect_obj = raycast.get_collider()
+						obj = second_connect_obj
+			else:
+				first_connect_obj = null
+				second_connect_obj = null
+				return
+		#highlight_object(obj)
 
+
+	if event.is_action_pressed("connect"):
+		if first_connect_obj != null and second_connect_obj != null and held_object == first_connect_obj or held_object == second_connect_obj:
+			ConnectingObjects.connect_objs(first_connect_obj, second_connect_obj, held_object)
 
 	if event is InputEventMouseMotion:
 		if not rotate_obj:
@@ -450,3 +484,39 @@ func shoot_ray_and_dig():
 		print(hit_position)
 	else:
 		print("Область еще не загружена или недоступна для редактирования!")
+
+
+func highlight_object(obj: Node3D):
+	var mesh_instance: MeshInstance3D = null
+	if obj is MeshInstance3D:
+		mesh_instance = obj
+	else:
+		mesh_instance = obj.find_child("MeshInstance3D", true, false)
+
+	if mesh_instance == null:
+		return
+
+	# Проходим по всем поверхностям
+	for i in mesh_instance.get_surface_override_material_count():
+		var current_mat = mesh_instance.get_active_material(i)
+		
+		if current_mat is StandardMaterial3D:
+			# 1. Делаем полную копию
+			var unique_mat = current_mat.duplicate()
+			
+			# 2. Принудительно включаем умножение цвета на текстуру
+			# (Это то, чего не хватало, если текстура перекрывала цвет)
+			unique_mat.albedo_texture = unique_mat.albedo_texture # просто обращаемся, чтобы убедиться, что текстура есть
+			
+			# 3. Устанавливаем цвет. 
+			# Вместо умножения ставим просто красный (или полупрозрачный красный)
+			# Если текстура темная, красный может быть незаметен. 
+			# Поэтому используем яркий красный.
+			unique_mat.albedo_color = Color(1.0, 0.3, 0.3) 
+			
+			# 4. ВАЖНО: Если у вас текстура в режиме 'Texture', а не 'Vertex Color', 
+			# цвет может не примениться. В Godot 4 цвет альбедо всегда умножается на текстуру.
+			# Но если вы видите, что не красится, возможно, материал - это ShaderMaterial.
+			
+			# 5. Применяем обратно
+			mesh_instance.set_surface_override_material(i, unique_mat)

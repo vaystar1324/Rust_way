@@ -184,3 +184,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 40, 0)
 
 [node name="доска2" parent="." unique_id=1534040515 instance=ExtResource("5_s1mi3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74114513, 40, 0)
+
+[node name="доска3" parent="." unique_id=1576380919 instance=ExtResource("5_s1mi3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74114513, 40, 0)
+
+[node name="доска4" parent="." unique_id=1041027082 instance=ExtResource("5_s1mi3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74114513, 40, 0)
+
+[node name="доска5" parent="." unique_id=1099337282 instance=ExtResource("5_s1mi3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.74114513, 40, 0)
