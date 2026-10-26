@@ -241,7 +241,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event is InputEventKey and event.physical_keycode == KEY_ESCAPE:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		
+
 	if event.is_action_pressed("shift"):
 		shift = not shift
 		set_crouch_height(shift)
