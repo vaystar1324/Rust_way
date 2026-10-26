@@ -66,18 +66,14 @@ enum CameraMode {
 @export var allow_camera_mode_switch: bool = false
 
 
-@export var max_distance: float = 3.0
-@export var ray_offset: float = 0.1 # расстояние между лучами (чтобы зацепить две разные доски)
-
-
-@export var grab_distance: float = 4.5
-@export var min_hold_distance: float = 1.2
-@export var max_hold_distance: float = 4.0
-@export var throw_force: float = 15.0
+@export var grab_distance: float = 2
+@export var min_hold_distance: float = 1
+@export var max_hold_distance: float = 2
+@export var throw_force: float = 200
 
 # Пружина позиции
-@export var stiffness: float = 200.0
-@export var damping: float = 22.0
+@export var stiffness: float = 500.0
+@export var damping: float = 15.0
 @export var max_force: float = 900.0
 
 # Пружина вращения
@@ -85,7 +81,7 @@ enum CameraMode {
 @export var angular_damping: float = 12.0
 
 # Чувствительность управления
-@export var distance_speed: float = 2.8          # скорость приближения/отдаления
+@export var distance_speed: float = 2          # скорость приближения/отдаления
 
 var held_object: RigidBody3D = null
 var is_holding := false
@@ -192,7 +188,7 @@ func _handle_controller_camera(delta: float) -> void:
 		camera_pivot.rotation.y -= look_dir.x * controller_sensitivity * delta
 		camera_pivot.rotation.x += look_dir.y * controller_sensitivity * delta
 		camera_pivot.rotation.x = clampf(camera_pivot.rotation.x, -tilt_limit, tilt_limit)
-		
+
 		raycast.rotation.y -= look_dir.x * controller_sensitivity * delta
 		raycast.rotation.x += look_dir.y * controller_sensitivity * delta
 		raycast.rotation.x = clampf(camera_pivot.rotation.x, -tilt_limit, tilt_limit)
@@ -250,8 +246,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		shift = not shift
 		set_crouch_height(shift)
 
-	if event.is_action_pressed("q"):
-		try_pin_objects()
 
 	if event is InputEventMouseMotion:
 		if not rotate_obj:
@@ -395,12 +389,13 @@ func release_object():
 		is_holding = false
 		held_object = null
 		return
+		
+	if Input.is_key_pressed(KEY_Q):
+		var throw_dir = -camera_3d.global_transform.basis.z
+		held_object.apply_central_impulse(throw_dir * throw_force)
 	
-	var throw_dir = -camera_3d.global_transform.basis.z
-	held_object.apply_central_impulse(throw_dir * throw_force)
-	
-	held_object.angular_damp = 0.1
-	held_object.linear_damp = 0.1
+		held_object.angular_damp = 0.5
+		held_object.linear_damp = 0.5
 	
 	held_object = null
 	is_holding = false
@@ -455,49 +450,3 @@ func shoot_ray_and_dig():
 		print(hit_position)
 	else:
 		print("Область еще не загружена или недоступна для редактирования!")
-
-
-func try_pin_objects() -> bool:
-	var space_state = get_world_3d().direct_space_state
-	var origin = camera_3d.global_position
-	var forward = -camera_3d.global_transform.basis.z
-	var right = camera_3d.global_transform.basis.x
-	var up = camera_3d.global_transform.basis.y
-	var target_dist = 2 # Твоя дистанция
-	
-	# Список векторов смещения для проверки:
-	# (горизонталь, вертикаль, диагонали)
-	var offsets = [right, up, (right + up).normalized(), (right - up).normalized()]
-	
-	for offset_dir in offsets:
-		print("забивание гвоздя")
-		var origin_a = origin - offset_dir * 0.15 # смещение 15 см
-		var origin_b = origin + offset_dir * 0.15
-		var target = origin + forward * target_dist
-		
-		var query = PhysicsRayQueryParameters3D.create(origin_a, target)
-		query.collide_with_bodies = true
-		
-		# Луч 1
-		var hit_a = space_state.intersect_ray(query)
-		# Луч 2
-		query.from = origin_b
-		var hit_b = space_state.intersect_ray(query)
-		
-		# Если оба луча попали в РАЗНЫЕ RigidBody3D — мы нашли стык!
-		print(hit_a, hit_b)
-		if hit_a and hit_b:
-			var body_a = hit_a.collider
-			var body_b = hit_b.collider
-			
-			if body_a is RigidBody3D and body_b is RigidBody3D and body_a != body_b:
-				# Вычисляем точку гвоздя
-				var pin_point = (hit_a.position + hit_b.position) / 2.0
-				
-				# Вызываем твою функцию pin()
-				ConnectingObjects.pin(body_a, body_b, pin_point)
-				print("Гвоздь забит автоматически (направление: ", offset_dir, ")")
-				return true # Успех, выходим из функции
-				
-	# Если ни одна пара лучей не нашла стык двух досок
-	return false

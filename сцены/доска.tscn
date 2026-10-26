@@ -16,7 +16,7 @@ uv1_triplanar = true
 [node name="доска" type="RigidBody3D" unique_id=984523267]
 collision_layer = 3
 collision_mask = 3
-mass = 15.0
+mass = 20.0
 sleeping = true
 continuous_cd = true
 linear_damp = 1.0

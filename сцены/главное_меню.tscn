@@ -8,6 +8,17 @@
 [ext_resource type="Texture2D" uid="uid://bynsyiqcgmwus" path="res://текстуры/ржавчина.jpg" id="5_xvctf"]
 [ext_resource type="FontFile" uid="uid://bi3inap5vk86e" path="res://MISTRAL.TTF" id="7_3ktki"]
 
+[sub_resource type="ZN_FastNoiseLiteGradient" id="ZN_FastNoiseLiteGradient_rsvwm"]
+noise_type = 0
+period = 44.3001
+amplitude = 30.0001
+
+[sub_resource type="ZN_FastNoiseLite" id="ZN_FastNoiseLite_rsvwm"]
+noise_type = 5
+period = 200.0001
+warp_noise = SubResource("ZN_FastNoiseLiteGradient_rsvwm")
+fractal_octaves = 4
+
 [sub_resource type="ZN_FastNoiseLiteGradient" id="ZN_FastNoiseLiteGradient_f7nrm"]
 noise_type = 0
 period = 16.0001
@@ -21,20 +32,9 @@ warp_noise = SubResource("ZN_FastNoiseLiteGradient_f7nrm")
 fractal_type = 2
 fractal_gain = 1.0
 
-[sub_resource type="ZN_FastNoiseLiteGradient" id="ZN_FastNoiseLiteGradient_rsvwm"]
-noise_type = 0
-period = 44.3001
-amplitude = 30.0001
-
-[sub_resource type="ZN_FastNoiseLite" id="ZN_FastNoiseLite_rsvwm"]
-noise_type = 5
-period = 200.0001
-warp_noise = SubResource("ZN_FastNoiseLiteGradient_rsvwm")
-fractal_octaves = 4
-
 [sub_resource type="VoxelGeneratorGraph" id="VoxelGeneratorGraph_xvctf"]
 graph_data = {
-"connections": [[25, 0, 24, 0], [1, 0, 20, 0], [1, 0, 6, 0], [19, 0, 33, 1], [20, 0, 21, 0], [21, 0, 22, 0], [22, 0, 26, 1], [23, 0, 25, 0], [24, 0, 33, 0], [26, 0, 19, 0], [27, 0, 28, 0], [28, 0, 29, 0], [29, 0, 32, 0], [3, 0, 6, 1], [30, 0, 31, 0], [31, 0, 32, 1], [32, 0, 19, 1], [33, 0, 4, 0], [6, 0, 7, 0], [7, 0, 27, 0], [7, 0, 24, 1]],
+"connections": [[7, 0, 27, 0], [7, 0, 24, 1], [6, 0, 7, 0], [33, 0, 4, 0], [31, 0, 32, 1], [32, 0, 19, 1], [3, 0, 6, 1], [29, 0, 32, 0], [28, 0, 29, 0], [27, 0, 28, 0], [26, 0, 19, 0], [25, 0, 24, 0], [24, 0, 33, 0], [23, 0, 25, 0], [22, 0, 26, 1], [21, 0, 22, 0], [20, 0, 21, 0], [19, 0, 33, 1], [30, 0, 31, 0], [1, 0, 20, 0], [1, 0, 6, 0]],
 "nodes": {
 "1": {
 "auto_connect": false,
@@ -77,7 +77,7 @@ graph_data = {
 "25": {
 "auto_connect": false,
 "b": 5.0,
-"gui_position": Vector2(958.3200531219036, 266.20001475608433),
+"gui_position": Vector2(958.32007, 266.2),
 "type": "Subtract"
 },
 "26": {
@@ -299,7 +299,7 @@ albedo_texture = ExtResource("5_xvctf")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_usgrm"]
 _surfaces = [{
-"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482434391975405, 1.9134706854820251),
+"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482435, 1.9134707),
 "format": 34896613377,
 "index_count": 372,
 "index_data": PackedByteArray("AAABAAIAAAADAAEAAwAhAAEAIQACAAEAAAAiAAMAAwAiACEABQAAAAIABQAiAAAABQACAAYAIwAFAAYAJAACACEAIgAkACEAAgATAAYAIwAGABMAJQAFACMAJQAjABMAJQAiAAUAAgAUABMAJAAUAAIAJQATACYAEwAUACYAJwAlACYAJwAmABQAGwAlACcAGwAnABQAKAAlABsAGwAUACAAKQAbACAAKAAbACkAKQAgAB8AKAApAB8AFAAfACAAKAAfAAcAKgAoAAcAHwAdAAcAKgAHAB0AFAAdAB8AHgAoACoAHgAqAB0AGQAoAB4AGQAlACgAHgAdABAAKwAeABAAGQAeACsAKwAQABwAHQAcABAAGQArABwAHQAaABwAFAAaAB0AGQAcACwAHAAaACwALQAZACwALQAsABoALgAZAC0ALgAtABoADgAlABkACwAZAC4ADgAZAAsALgAaAC8AJQAOACIACAAuAC8ACwAuAAgAGgAJAC8ACAAvAAkADAAIAAkAGgAMAAkACwAIAAwAGgAwAAwAFAAwABoACgALAAwACgAMAAQADAAwAAQAMQAKAAQAMQAEADAAMgAKADEAMgALAAoAMgAxADAADgALADIAFAAzADAAMgAwAA8AMwAUACQANAAyAA8AMAA1AA8ANAAPADUAGAAyADQAGAA0ADUADgAyABgAGAA1ABcANgAYABcADgAYADYANQA3ABcAMAA3ADUANgAXADcAMAAzADcADgA2ADcADgA3ABYAOAAOABYANwA5ABYAOAAWADkANwAzADkAOgAOADgAOgA4ADkAOgA5AA0AOQAzAA0AOwA6AA0AOwANADMAFQAOADoAFQA6ADsAFQA7ADMAIgAOABUAFQAzABIAPAAVABIAMwA9ABIAPAASAD0AMwAkAD0APgAVADwAIgAVAD4APgA8AD0AIgA/ACQAIgA+AD8APwARACQAPQAkABEAPwA+ABEAPgA9ABEA"),
@@ -314,7 +314,7 @@ blend_shape_mode = 0
 [sub_resource type="ArrayMesh" id="ArrayMesh_ddmft"]
 resource_name = "табличка_Cylinder"
 _surfaces = [{
-"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482434391975405, 1.9134706854820251),
+"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482435, 1.9134707),
 "attribute_data": PackedByteArray("////f//3AAD//wAA//f/f//3/3//fwAA//cAAP9//3//f/9//3cAAP9/AAD/d/9//3f/f/9v/3//dwAA/28AAP9v/3//NwAA/28AAP8H/3//BwAA/z+Ogr0DArQDNL2D/z9v/fxLvYN8KML4AzRB/P8H/38AAAAA/wcAAAAA/38CtL2D+8u9g/+/joJ8qML4ArRB/P+/b/3/vwAA/6//f/+PAAD/RwAAglfC+L0D+8twff+/wviC1//fAAD/zwAA/8//f/+vAAD/nwAA/5//f/9fAAD/V/9//08AAP9H/3//PwAA/yf/f/8vAAD/JwAA/x8AAP8PAAB8KDyHjhSNlHFrjZTCeHyocWtw68J4gteOFHDrjwL/vzwHgtc8B3yo6gzdnXDrcOvpjCHi6Yzdnb2D+8vC+Hyo/+8AAP/v/3//7/9//+cAAP/vAAD/5/9//+f/f//nAAD/3/9//9//f//XAAD/3wAA/9f/f//X/3//1wAA/8//f//HAAD/zwAA/8f/f//H/3//vwAA/8cAAP+//3//v/9//7cAAP+3/3//t/9//68AAP+3AAD/r/9//6cAAP+n/3//p/9//58AAP+nAAD/n/9//5cAAP+X/3//l/9//48AAP+XAAD/j/9//4//f/+HAAD/h/9//4f/f/+HAAD/ZwAA/2f/f/9n/3//ZwAA/1//f/9f/3//VwAA/18AAP9X/3//VwAA/0//f/9P/3//TwAA/0f/f/9HAAD/P/9//z//f/83AAD/PwAA/zf/f/83/3//LwAA/y//f/8v/3//JwAA/yf/f/8fAAD/H/9//x//f/8XAAD/F/9//xf/f/8PAAD/FwAA/w//f4JXPIchYumM3R3pjBVz3Z1BfAK0QXz7yxVzIeL8S0H8IWIU890dFPPqDCHi/w//f4LXPIfdnemMfKg8h3DrjZQh4umMFPPdnW/9/79B/AK0Qfz7y42UjZS9gwK0PId8qI6C/788h4LX3Z0U842UcOuC18L4+8tB/CHiFPMU8yHi"),
 "format": 34896613399,
 "index_count": 372,
@@ -370,7 +370,7 @@ shadow_mesh = SubResource("ArrayMesh_7h8k0")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_qt7hj"]
 _surfaces = [{
-"aabb": AABB(-0.9915371, -0.99164706, -0.99164784, 1.9831859, 1.9818320870399475, 1.9823449),
+"aabb": AABB(-0.9915371, -0.99164706, -0.99164784, 1.9831859, 1.981832, 1.9823449),
 "format": 34896613377,
 "index_count": 156,
 "index_data": PackedByteArray("AAABAAIAAAADAAEADwACAAEAAwAPAAEAEAAAAAIAAwAAABAADwARAAIAEAACABEAAwASAA8AAwAQABIAEgAKAA8ACgARAA8AEgAQABMAEwAQABEAEgALAAoAEgATAAsACgAUABEAEwARABQABQAUAAoACwAFAAoAFQATABQACwATABUABQAWABQAFQAUABYACwAEAAUACwAVAAQABAANAAUADQAWAAUABAAVABcAFwAVABYABAAOAA0ABAAXAA4ADQAMABYAFwAWAAwAGAAMAA0ADgAYAA0AGQAXAAwADgAXABkAGAAaAAwAGQAMABoADgAbABgADgAZABsAGwAJABgACQAaABgAGwAIAAkACQAHABoACAAHAAkABgAZABoAGwAZAAYABgAaAAcAGwAGAAgACAAGAAcA"),
@@ -385,7 +385,7 @@ blend_shape_mode = 0
 [sub_resource type="ArrayMesh" id="ArrayMesh_6vafy"]
 resource_name = "табличка_Cube_002"
 _surfaces = [{
-"aabb": AABB(-0.9915371, -0.99164706, -0.99164784, 1.9831859, 1.9818320870399475, 1.9823449),
+"aabb": AABB(-0.9915371, -0.99164706, -0.99164784, 1.9831859, 1.981832, 1.9823449),
 "attribute_data": PackedByteArray("//////9f/////////5//v///////n/////////9f/7///////1//f///////n/8///////+f/3///////1//P///////X/8///////9fAAD//////58AAP//////n/8///////9fU6D//////59ToP//////n/+///////9f/7///////x//f///////H/8//////6w//3///////1//P///////X/9//////1LA/3///////9//P///////3/9///////+f/3///////5//P///////X1Og//////+f/3///////59ToP//////X/9//////z64/3//////Prj/P/////8xyP9//////803/3//////wEf/f///////n8En//////9fMaj//////58xqP//////Xz6Y//////+fPpj//////18pkP//////nymQ//////9f1g///////5/WD//////VT/9//////9VP/z//////wEf/f//////AR/8//////ynQ/3//////KdD/P/////8xyP8//////1LA/z//////KbD/f/////8psP8//////803/3//////rD//P/////+sP/9//////803/z///////1/BJ///////n6wf//////9frB///////5/NF///////X80X//////+f1g///////1/WD///////XzGo//////+fMaj//////58psP//////Xymw/////9Uv/z//////1S//f//////VL/9//////803/z//////1S//P///////n9Uv//////9f1S///////5/BJ///////X8En//////+fPpj//////18+mP/////AR/8//////6w//z8="),
 "format": 34896613407,
 "index_count": 156,
@@ -510,7 +510,7 @@ uv1_world_triplanar = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_olue6"]
 _surfaces = [{
-"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482434391975405, 1.9134706854820251),
+"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482435, 1.9134707),
 "format": 34896613377,
 "index_count": 372,
 "index_data": PackedByteArray("AAABAAIAAAADAAEAAwAhAAEAIQACAAEAAAAiAAMAAwAiACEABQAAAAIABQAiAAAABQACAAYAIwAFAAYAJAACACEAIgAkACEAAgATAAYAIwAGABMAJQAFACMAJQAjABMAJQAiAAUAAgAUABMAJAAUAAIAJQATACYAEwAUACYAJwAlACYAJwAmABQAGwAlACcAGwAnABQAKAAlABsAGwAUACAAKQAbACAAKAAbACkAKQAgAB8AKAApAB8AFAAfACAAKAAfAAcAKgAoAAcAHwAdAAcAKgAHAB0AFAAdAB8AHgAoACoAHgAqAB0AGQAoAB4AGQAlACgAHgAdABAAKwAeABAAGQAeACsAKwAQABwAHQAcABAAGQArABwAHQAaABwAFAAaAB0AGQAcACwAHAAaACwALQAZACwALQAsABoALgAZAC0ALgAtABoADgAlABkACwAZAC4ADgAZAAsALgAaAC8AJQAOACIACAAuAC8ACwAuAAgAGgAJAC8ACAAvAAkADAAIAAkAGgAMAAkACwAIAAwAGgAwAAwAFAAwABoACgALAAwACgAMAAQADAAwAAQAMQAKAAQAMQAEADAAMgAKADEAMgALAAoAMgAxADAADgALADIAFAAzADAAMgAwAA8AMwAUACQANAAyAA8AMAA1AA8ANAAPADUAGAAyADQAGAA0ADUADgAyABgAGAA1ABcANgAYABcADgAYADYANQA3ABcAMAA3ADUANgAXADcAMAAzADcADgA2ADcADgA3ABYAOAAOABYANwA5ABYAOAAWADkANwAzADkAOgAOADgAOgA4ADkAOgA5AA0AOQAzAA0AOwA6AA0AOwANADMAFQAOADoAFQA6ADsAFQA7ADMAIgAOABUAFQAzABIAPAAVABIAMwA9ABIAPAASAD0AMwAkAD0APgAVADwAIgAVAD4APgA8AD0AIgA/ACQAIgA+AD8APwARACQAPQAkABEAPwA+ABEAPgA9ABEA"),
@@ -525,7 +525,7 @@ blend_shape_mode = 0
 [sub_resource type="ArrayMesh" id="ArrayMesh_isahl"]
 resource_name = "табличка_Cylinder_003"
 _surfaces = [{
-"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482434391975405, 1.9134706854820251),
+"aabb": AABB(-0.74437606, -0.25613564, -0.98078525, 1.7443761, 1.4482435, 1.9134707),
 "attribute_data": PackedByteArray("////f//3AAD//wAA//f/f//3/3//fwAA//cAAP9//3//f/9//3cAAP9/AAD/d/9//3f/f/9v/3//dwAA/28AAP9v/3//NwAA/28AAP8H/3//BwAA/z+Ogr0DArQDNL2D/z9v/fxLvYN8KML4AzRB/P8H/38AAAAA/wcAAAAA/38CtL2D+8u9g/+/joJ8qML4ArRB/P+/b/3/vwAA/6//f/+PAAD/RwAAglfC+L0D+8twff+/wviC1//fAAD/zwAA/8//f/+vAAD/nwAA/5//f/9fAAD/V/9//08AAP9H/3//PwAA/yf/f/8vAAD/JwAA/x8AAP8PAAB8KDyHjhSNlHFrjZTCeHyocWtw68J4gteOFHDrjwL/vzwHgtc8B3yo6gzdnXDrcOvpjCHi6Yzdnb2D+8vC+Hyo/+8AAP/v/3//7/9//+cAAP/vAAD/5/9//+f/f//nAAD/3/9//9//f//XAAD/3wAA/9f/f//X/3//1wAA/8//f//HAAD/zwAA/8f/f//H/3//vwAA/8cAAP+//3//v/9//7cAAP+3/3//t/9//68AAP+3AAD/r/9//6cAAP+n/3//p/9//58AAP+nAAD/n/9//5cAAP+X/3//l/9//48AAP+XAAD/j/9//4//f/+HAAD/h/9//4f/f/+HAAD/ZwAA/2f/f/9n/3//ZwAA/1//f/9f/3//VwAA/18AAP9X/3//VwAA/0//f/9P/3//TwAA/0f/f/9HAAD/P/9//z//f/83AAD/PwAA/zf/f/83/3//LwAA/y//f/8v/3//JwAA/yf/f/8fAAD/H/9//x//f/8XAAD/F/9//xf/f/8PAAD/FwAA/w//f4JXPIchYumM3R3pjBVz3Z1BfAK0QXz7yxVzIeL8S0H8IWIU890dFPPqDCHi/w//f4LXPIfdnemMfKg8h3DrjZQh4umMFPPdnW/9/79B/AK0Qfz7y42UjZS9gwK0PId8qI6C/788h4LX3Z0U842UcOuC18L4+8tB/CHiFPMU8yHi"),
 "format": 34896613399,
 "index_count": 372,
@@ -579,10 +579,9 @@ shadow_mesh = SubResource("ArrayMesh_t823n")
 script = ExtResource("1_36yt1")
 
 [node name="VoxelLodTerrain" type="VoxelLodTerrain" parent="." unique_id=601030527]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.415409360622988, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.415409, 0)
 generator = SubResource("VoxelGeneratorGraph_xvctf")
 mesher = SubResource("VoxelMesherTransvoxel_3ktki")
-voxel_bounds = AABB(-536870900, -536870900, -536870900, 1073741800, 1073741800, 1073741800)
 material = SubResource("ShaderMaterial_l8njw")
 collision_margin = 0.08
 
@@ -590,7 +589,7 @@ collision_margin = 0.08
 environment = SubResource("Environment_36yt1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1753365186]
-transform = Transform3D(-0.8660254037844387, -0.4330127018922192, 0.25, 0, 0.5000000000000001, 0.8660254037844386, -0.49999999999999994, 0.75, -0.43301270189221946, 0, 234.4439017877725, -121.24130639528062)
+transform = Transform3D(-0.8660254, -0.4330127, 0.25, 0, 0.5, 0.8660254, -0.5, 0.75, -0.4330127, 0, 234.44391, -121.24131)
 light_color = Color(1, 1, 0.72156864, 1)
 light_energy = 0.0
 shadow_enabled = true
@@ -598,7 +597,7 @@ shadow_bias = 0.0
 shadow_normal_bias = 2.061
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=266737094]
-transform = Transform3D(0.9999872857865072, 0, -0.00504264467659276, 0, 1, 0, 0.00504264467659276, 0, 0.9999872857865072, -125.93161089471526, 29.04521233186787, -267.3811429073083)
+transform = Transform3D(0.9999873, 0, -0.0050426447, 0, 1, 0, 0.0050426447, 0, 0.9999873, -125.93161, 29.045212, -267.38113)
 
 [node name="VoxelViewer" type="VoxelViewer" parent="Camera3D" unique_id=1568964443]
 
@@ -680,51 +679,51 @@ item_count = 1
 item_0/text = "+создать новый мир"
 
 [node name="табличка" type="Node3D" parent="." unique_id=1567217118]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -127.3326937517316, 26.988315391443287, -269.91332760499824)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -127.332695, 26.988316, -269.91333)
 
 [node name="Cylinder" type="MeshInstance3D" parent="табличка" unique_id=292065092]
-transform = Transform3D(0.16635958409261647, 0.5438151833241794, 3.885337310950599e-09, -0.10645926945569832, 0.8287441172760153, 0.03803769678158989, 0.01696831308632785, -0.13209176532429115, 0.2386486354996106, 0, 0.6400174, 0.15131342)
+transform = Transform3D(0.16635959, 0.5438152, 3.8853374e-09, -0.10645927, 0.8287441, 0.038037695, 0.016968314, -0.13209176, 0.23864864, 0, 0.6400174, 0.15131342)
 material_override = SubResource("StandardMaterial3D_3ktki")
 mesh = SubResource("ArrayMesh_ddmft")
 
 [node name="Cube" type="MeshInstance3D" parent="табличка" unique_id=406054143]
-transform = Transform3D(0.1130248, 0, 0, 0, 0.9875347636890328, 0.04119713271995902, 0, -0.15740104988736917, 0.2584709616256197, 0.6270163, 2.311005, -0.115021735)
+transform = Transform3D(0.1130248, 0, 0, 0, 0.98753476, 0.041197132, 0, -0.15740106, 0.25847095, 0.6270163, 2.311005, -0.115021735)
 material_override = SubResource("StandardMaterial3D_xvctf")
 mesh = SubResource("ArrayMesh_bfxsd")
 
 [node name="Cube_001" type="MeshInstance3D" parent="табличка" unique_id=1242272941]
-transform = Transform3D(1, 0, 0, 0, -0.15240378288370085, 0.01730944441335591, 0, 0.02429131238184439, 0.10859951766880543, 1.4430251, 3.074503, -0.236714)
+transform = Transform3D(1, 0, 0, 0, -0.15240379, 0.017309444, 0, 0.024291312, 0.10859952, 1.4430251, 3.074503, -0.236714)
 material_override = SubResource("StandardMaterial3D_xvctf")
 mesh = SubResource("ArrayMesh_6vafy")
 
 [node name="Cube_002" type="MeshInstance3D" parent="табличка" unique_id=189134956]
-transform = Transform3D(0.1130248, 0, 0, 0, 0.9875347636890328, 0.04119713271995902, 0, -0.15740104988736917, 0.2584709616256197, 2.2519605, 2.311005, -0.115021735)
+transform = Transform3D(0.1130248, 0, 0, 0, 0.98753476, 0.041197132, 0, -0.15740106, 0.25847095, 2.2519605, 2.311005, -0.115021735)
 material_override = SubResource("StandardMaterial3D_xvctf")
 mesh = SubResource("ArrayMesh_td1jh")
 
 [node name="Cylinder_002" type="MeshInstance3D" parent="табличка" unique_id=1649003861]
-transform = Transform3D(0.24080586, 0, 0, 0, 1.7976077846851577, -0.12254100616829816, 0, 0.9824026883652044, 0.2242264493370321, 1.4188089, -0.28380322, -1.0379074)
+transform = Transform3D(0.24080586, 0, 0, 0, 1.7976078, -0.122541, 0, 0.9824027, 0.22422644, 1.4188089, -0.28380322, -1.0379074)
 material_override = SubResource("StandardMaterial3D_l8njw")
 mesh = SubResource("ArrayMesh_5jodx")
 
 [node name="Cube_003" type="MeshInstance3D" parent="табличка" unique_id=1926216676]
-transform = Transform3D(0.9398360252380372, 0, 0, 0, -0.06852286565507734, 0.01366055729114948, 0, 0.01092171272544347, 0.08570638649506454, 1.4430251, 1.4763958, 0.01800480484962463)
+transform = Transform3D(0.939836, 0, 0, 0, -0.06852286, 0.013660558, 0, 0.010921713, 0.08570638, 1.4430251, 1.4763958, 0.018004805)
 material_override = SubResource("StandardMaterial3D_xvctf")
 mesh = SubResource("ArrayMesh_dw2d2")
 
 [node name="Cylinder_001" type="MeshInstance3D" parent="табличка" unique_id=588697786]
-transform = Transform3D(-0.1662547540727752, -0.5434725969552886, 0.00857701660890576, -0.1073886307994094, 0.8257060891901576, -0.03801373274113722, 0.01113749239635261, -0.15115221014914046, -0.2384982928943293, 2.8882055, 0.6348022, 0.15214461)
+transform = Transform3D(-0.16625476, -0.5434726, 0.008577016, -0.10738863, 0.82570606, -0.038013734, 0.011137492, -0.15115221, -0.2384983, 2.8882055, 0.6348022, 0.15214461)
 material_override = SubResource("StandardMaterial3D_l63xd")
 mesh = SubResource("ArrayMesh_isahl")
 
 [node name="Plane" type="MeshInstance3D" parent="табличка" unique_id=714679059]
-transform = Transform3D(0.66675043, 0, 0, 0, 0.14498909049027664, -0.9733917549181096, 0, 0.9894306633847167, 0.14263878254340642, 1.4252784, 2.4547396, -0.03152877)
+transform = Transform3D(0.66675043, 0, 0, 0, 0.14498909, -0.9733918, 0, 0.98943067, 0.14263879, 1.4252784, 2.4547396, -0.03152877)
 material_override = SubResource("StandardMaterial3D_0gnae")
 mesh = SubResource("ArrayMesh_lxylh")
 
 [node name="Label3D" type="Label3D" parent="табличка/Plane" unique_id=1352148255]
-transform = Transform3D(1.499811553790844, 0, 0, 0, 0.00063999573430614, 1.000002358209528, 0, -1.016479738677029, 0.00065054116264953, 0.03818891296683091, 0.00468280951264432, 0.1283211007240368)
-pixel_size = 0.00999999999999999
+transform = Transform3D(1.4998115, 0, 0, 0, 0.00063999573, 1.0000024, 0, -1.0164797, 0.00065054116, 0.038188912, 0.0046828096, 0.1283211)
+pixel_size = 0.01
 modulate = Color(0.15869287, 0.15834627, 0.3162352, 1)
 outline_modulate = Color(0, 0, 0, 0)
 text = "Ржавый

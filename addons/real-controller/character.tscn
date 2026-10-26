@@ -515,11 +515,10 @@ albedo_texture = ExtResource("2_uyauv")
 [node name="Character" type="CharacterBody3D" unique_id=1913778194]
 collision_layer = 2
 script = ExtResource("1_6lnd0")
+jump_velocity = 6.0
 rotation_speed = 8.0
 camera_mode = 0
 allow_camera_mode_switch = true
-grab_distance = 2.0
-max_hold_distance = 2.0
 damping = 5.0
 angular_stiffness = 12.0
 angular_damping = 18.0
@@ -974,6 +973,7 @@ target_position = Vector3(0, 0, -2)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.993)
 
 [node name="Label" type="Label" parent="." unique_id=270765051]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
